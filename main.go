@@ -21,4 +21,17 @@ func main() {
 	}
 	fmt.Println("Tenant added")
 
+	//inserting pod
+	pod := &model.Pod{
+		Name:      "Pod 1",
+		Status:    "Pending",
+		IpAddress: "10.2.0.11",
+	}
+
+	err = db.Insert(pod)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Pod added")
+
 }
