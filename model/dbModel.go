@@ -1,57 +1,52 @@
 package model
 
 import (
-	"fmt"
+	"time"
+
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
-	"time"
 )
 
 type Root struct {
 	AccountID int64 `pg:",pk" json:"account_id"`
 }
 
-func (r *Root) String() string {
-	return fmt.Sprintf("Root<%d>", r.AccountID)
-}
-
 type Tenant struct {
-	ID            int64
-	Name          string
-	Email         string
-	RootAccountID int64 `pg:",fk"`
-	Root          *Root
-	CreatedAt     time.Time `pg:"default:now()"`
-}
-
-func (t *Tenant) String() string {
-	return fmt.Sprintf("Tenant<%d %s %s>", t.ID, t.Name, t.Email)
+	ID            int64     `pg:",pk" json:"id"`
+	Name          string    `json:"name"`
+	Description   string    `json:"description"`
+	Email         string    `json:"email"`
+	RootAccountID int64     `pg:",fk" json:"root_account_id"`
+	IsActivated   bool      `json:"is_activated"`
+	ActivateLater time.Time `json:"activate_later"`
+	Root          *Root     `json:"root"`
+	CreatedAt     time.Time `pg:"default:now()" json:"created_at"`
 }
 
 type Pod struct {
-	ID                 int64
-	Name               string
-	Status             string
-	IpAddress          string
-	SubscriptionTypeID int64
-	SubscriptionType   *SubType
-	CreatedAt          time.Time `pg:"default:now()"`
+	ID                 int64             `pg:",pk" json:"id"`
+	Name               string            `json:"name"`
+	SubscriptionTypeID int64             `pg:",fk" json:"subscription_type_id"`
+	SubscriptionType   *SubscriptionType `json:"subscription_type"`
+	Status             string            `json:"status"`
+	IpAddress          string            `json:"ip_address"`
+	CreatedAt          time.Time         `pg:"default:now()" json:"created_at"`
 }
 
-func (p *Pod) String() string {
-	return fmt.Sprintf("Pod<%d %s %s %s>", p.ID, p.Name, p.Status, p.IpAddress)
+type SubscriptionType struct {
+	ID         int64     `pg:",pk" json:"id"`
+	RefTypeID  int64     `pg:",fk" json:"ref_type_id"`
+	RefType    *RefType  `json:"ref_type"`
+	ExpiryTime time.Time `json:"expiry_time"`
+	TenantID   int64     `pg:",fk" json:"tenant_id"`
+	Tenant     *Tenant   `json:"tenant"`
 }
 
-type SubType struct {
-	ID         int64
-	TypeName   string
-	ExpiryTime time.Time
-	TenantID   int64
-	Tenant     *Tenant
-}
-
-func (s *SubType) String() string {
-	return fmt.Sprintf("Pod<%d %s %s>", s.ID, s.TypeName, s.ExpiryTime)
+type RefType struct {
+	ID                  int64  `pg:",pk" json:"id"`
+	TypeName            string `json:"type_name"`
+	TrainingContentName string `json:"training_content_name"`
+	TrainingContent     []byte `pg:"type:bytea" json:"training_content"`
 }
 
 // createSchema creates database schema for models.
@@ -60,7 +55,8 @@ func CreateSchema(db *pg.DB) error {
 		(*Root)(nil),
 		(*Tenant)(nil),
 		(*Pod)(nil),
-		(*SubType)(nil),
+		(*SubscriptionType)(nil),
+		(*RefType)(nil),
 	}
 
 	for _, model := range models {
