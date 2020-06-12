@@ -26,6 +26,8 @@ type Tenant struct {
 type Pod struct {
 	ID                 int64             `pg:",pk" json:"id"`
 	Name               string            `json:"name"`
+	ConfigurationID    int64             `pg:",fk" json:"configuration_id"`
+	Configuration      *Configuration    `json:"configuration"`
 	SubscriptionTypeID int64             `pg:",fk" json:"subscription_type_id"`
 	SubscriptionType   *SubscriptionType `json:"subscription_type"`
 	Status             string            `json:"status"`
@@ -49,6 +51,44 @@ type RefType struct {
 	TrainingContent     []byte `pg:"type:bytea" json:"training_content"`
 }
 
+type Vcenter struct {
+	ID        int64  `pg:",pk" json:"id"`
+	IpAddress string `json:"ip_address"`
+	UserName  string `json:"user_name"`
+	Password  string `json:"password"`
+}
+
+type Cluster struct {
+	ID        int64    `pg:",pk" json:"id"`
+	Name      string   `json:"name"`
+	VcenterID int64    `pg:",fk" json:"vcenter_id"`
+	Vcenter   *Vcenter `json:"vcenter"`
+}
+
+type VappTemplate struct {
+	ID        int64    `pg:",pk" json:"id"`
+	Name      string   `json:"name"`
+	RefTypeID int64    `pg:",fk" json:"ref_type_id"`
+	RefType   *RefType `json:"ref_type"`
+	ClusterID int64    `pg:",fk" json:"cluster_id"`
+	Cluster   *Cluster `json:"cluster"`
+}
+
+type Datastore struct {
+	ID        int64    `pg:",pk" json:"id"`
+	Name      string   `json:"name"`
+	VcenterID int64    `pg:",fk" json:"vcenter_id"`
+	Vcenter   *Vcenter `json:"vcenter"`
+}
+
+type Configuration struct {
+	ID             int64         `pg:",pk" json:"id"`
+	DatastoreID    int64         `pg:",fk" json:"datastore_id"`
+	Datastore      *Datastore    `json:"datastore"`
+	VappTemplateID int64         `pg:",fk" json:"vapp_template_id"`
+	VappTemplate   *VappTemplate `json:"vapp_template"`
+}
+
 // createSchema creates database schema for models.
 func CreateSchema(db *pg.DB) error {
 	models := []interface{}{
@@ -57,6 +97,12 @@ func CreateSchema(db *pg.DB) error {
 		(*Pod)(nil),
 		(*SubscriptionType)(nil),
 		(*RefType)(nil),
+
+		(*Vcenter)(nil),
+		(*Cluster)(nil),
+		(*VappTemplate)(nil),
+		(*Datastore)(nil),
+		(*Configuration)(nil),
 	}
 
 	for _, model := range models {
