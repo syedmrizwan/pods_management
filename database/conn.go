@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"github.com/go-pg/pg/v10"
 	"github.com/syedmrizwan/pods_management/env"
 	"github.com/syedmrizwan/pods_management/model"
@@ -10,6 +9,7 @@ import (
 var db *pg.DB
 
 func init() {
+	//todo add more config to the connection like idle timeout etc
 	db = pg.Connect(&pg.Options{
 		Addr:     env.Env.GetAddr(),
 		User:     env.Env.DbUsername,
@@ -17,34 +17,97 @@ func init() {
 		Database: env.Env.DbName,
 		PoolSize: env.Env.DbPoolSize,
 	})
-	err := model.CreateSchema(db)
-	if err != nil {
+	if err := model.CreateSchema(db); err != nil {
 		panic(err)
 	}
-	//check and create root user
-	GetRoot()
-
+	//Insert prerequisite data
+	InsertPrerequisite()
 }
 
-// GetConnection returns pg connection
 func GetConnection() *pg.DB {
 	return db
 }
 
-func GetRoot() *model.Root {
-	// Select user by primary key.
+func populateRoot() error {
 	root := &model.Root{AccountID: 1}
-	err := db.Select(root)
-	if err != nil {
-		// adding root user
-		root := &model.Root{
-			AccountID: 1,
-		}
-		err := db.Insert(root)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("Root user added")
+	if _, err := db.Model(root).Where("account_id = ?account_id").SelectOrInsert(); err != nil {
+		return err
 	}
-	return root
+	return nil
+}
+
+func selectOrInsertRefType(typeName string) (*model.RefType, error) {
+	refType := &model.RefType{
+		TypeName: typeName,
+	}
+	if _, err := db.Model(refType).Where("type_name = ?type_name").SelectOrInsert(); err != nil {
+		return nil, err
+	}
+	return refType, nil
+}
+
+//TODO: populate configuration dynamically
+func populateConfiguration() error {
+	vcenter := &model.Vcenter{
+		IpAddress: "127.0.0.1",
+		UserName:  "rizwan",
+		Password:  "password",
+	}
+	if _, err := db.Model(vcenter).Where("ip_address = ?ip_address").SelectOrInsert(); err != nil {
+		return err
+	}
+
+	datastore := &model.Datastore{
+		Name:      "Datastore",
+		VcenterID: vcenter.ID,
+	}
+	if _, err := db.Model(datastore).Where("name = ?name").SelectOrInsert(); err != nil {
+		return err
+	}
+
+	cluster := &model.Cluster{
+		Name:      "Cluster",
+		VcenterID: vcenter.ID,
+	}
+	if _, err := db.Model(cluster).Where("name = ?name").SelectOrInsert(); err != nil {
+		return err
+	}
+
+	refType, _ := selectOrInsertRefType("sdwan")
+	vappTemplate := &model.VappTemplate{
+		Name:      "Template",
+		ClusterID: cluster.ID,
+		RefTypeID: refType.ID,
+	}
+	if _, err := db.Model(vappTemplate).Where("name = ?name").SelectOrInsert(); err != nil {
+		return err
+	}
+
+	configuration := &model.Configuration{
+		DatastoreID:    datastore.ID,
+		VappTemplateID: vappTemplate.ID,
+	}
+	if _, err := db.Model(configuration).Where("datastore_id = ?datastore_id").
+		Where("vapp_template_id = ?vapp_template_id").SelectOrInsert(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertPrerequisite() error {
+	if err := populateRoot(); err != nil {
+		return err
+	}
+	if _, err := selectOrInsertRefType("Type-A"); err != nil {
+		return err
+	}
+	if _, err := selectOrInsertRefType("Type-B"); err != nil {
+		return err
+	}
+	if err := populateConfiguration(); err != nil {
+		return err
+	}
+	return nil
+
 }
