@@ -6,6 +6,25 @@ import (
 	"github.com/syedmrizwan/pods_management/model"
 )
 
+func testJoins() {
+	db := database.GetConnection()
+
+	var tenants []model.Tenant
+	err := db.Model(&tenants).
+		Column("tenant.*").
+		Relation("SubscriptionTypes").
+		Relation("SubscriptionTypes.Pods").
+		Relation("SubscriptionTypes.RefType").
+		Select()
+	if err != nil {
+		// Error Handler
+	} else {
+		fmt.Println(tenants)
+		fmt.Println(tenants[0].SubscriptionTypes[1].Pods[0].Name)
+		fmt.Println(tenants[0].SubscriptionTypes[1].RefType.TypeName)
+	}
+}
+
 func main() {
 	db := database.GetConnection()
 
@@ -33,5 +52,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Pod added")
+
+	testJoins()
 
 }
