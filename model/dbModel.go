@@ -2,7 +2,7 @@ package model
 
 import (
 	"time"
-
+	"fmt"
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
 )
@@ -26,8 +26,10 @@ type Tenant struct {
 type Pod struct {
 	ID                 int64             `pg:",pk" json:"id"`
 	Name               string            `json:"name"`
-	ConfigurationID    int64             `pg:",fk" json:"configuration_id"`
-	Configuration      *Configuration    `json:"configuration"`
+	DatastoreID        int64             `pg:",fk" json:"datastore_id"`
+	Datastore          *Datastore        `json:"datastore"`
+	ClusterID          int64             `pg:",fk" json:"cluster_id"`
+	Cluster            *Cluster          `json:"cluster"`
 	SubscriptionTypeID int64             `pg:",fk" json:"subscription_type_id"`
 	SubscriptionType   *SubscriptionType `json:"subscription_type"`
 	Status             string            `json:"status"`
@@ -45,10 +47,17 @@ type SubscriptionType struct {
 }
 
 type RefType struct {
-	ID                  int64  `pg:",pk" json:"id"`
-	TypeName            string `json:"type_name"`
-	TrainingContentName string `json:"training_content_name"`
-	TrainingContent     []byte `pg:"type:bytea" json:"training_content"`
+	ID               int64  `pg:",pk" json:"id"`
+	TypeName         string `json:"type_name"`
+	VappTemplateName string `json:"vapp_template_name"`
+}
+
+type TrainingContent struct {
+	ID        int64    `pg:",pk" json:"id"`
+	Name      string   `json:"name"`
+	Content   []byte   `pg:"type:bytea" json:"content"`
+	RefTypeID int64    `pg:",fk" json:"ref_type_id"`
+	RefType   *RefType `json:"ref_type"`
 }
 
 type Vcenter struct {
@@ -65,28 +74,11 @@ type Cluster struct {
 	Vcenter   *Vcenter `json:"vcenter"`
 }
 
-type VappTemplate struct {
-	ID        int64    `pg:",pk" json:"id"`
-	Name      string   `json:"name"`
-	RefTypeID int64    `pg:",fk" json:"ref_type_id"`
-	RefType   *RefType `json:"ref_type"`
-	ClusterID int64    `pg:",fk" json:"cluster_id"`
-	Cluster   *Cluster `json:"cluster"`
-}
-
 type Datastore struct {
 	ID        int64    `pg:",pk" json:"id"`
 	Name      string   `json:"name"`
 	VcenterID int64    `pg:",fk" json:"vcenter_id"`
 	Vcenter   *Vcenter `json:"vcenter"`
-}
-
-type Configuration struct {
-	ID             int64         `pg:",pk" json:"id"`
-	DatastoreID    int64         `pg:",fk" json:"datastore_id"`
-	Datastore      *Datastore    `json:"datastore"`
-	VappTemplateID int64         `pg:",fk" json:"vapp_template_id"`
-	VappTemplate   *VappTemplate `json:"vapp_template"`
 }
 
 // createSchema creates database schema for models.
@@ -97,12 +89,10 @@ func CreateSchema(db *pg.DB) error {
 		(*Pod)(nil),
 		(*SubscriptionType)(nil),
 		(*RefType)(nil),
-
 		(*Vcenter)(nil),
 		(*Cluster)(nil),
-		(*VappTemplate)(nil),
 		(*Datastore)(nil),
-		(*Configuration)(nil),
+		(*TrainingContent)(nil),
 	}
 
 	for _, model := range models {
@@ -115,4 +105,21 @@ func CreateSchema(db *pg.DB) error {
 		}
 	}
 	return nil
+}
+
+// Struct to String conversion
+func (r *Root) String() string {
+	return fmt.Sprintf("Root<%d>", r.AccountID)
+}
+
+func (t *Tenant) String() string {
+	return fmt.Sprintf("Tenant<%d %s %s %s>", t.ID, t.Name, t.Description, t.Email)
+}
+
+func (p *Pod) String() string {
+	return fmt.Sprintf("Pod<%d %s %s %s>", p.ID, p.Name, p.Status, p.IpAddress)
+}
+
+func (s *SubscriptionType) String() string {
+	return fmt.Sprintf("Pod<%d %s>", s.ID, s.ExpiryTime)
 }

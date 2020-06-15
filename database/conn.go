@@ -36,9 +36,10 @@ func populateRoot() error {
 	return nil
 }
 
-func selectOrInsertRefType(typeName string) (*model.RefType, error) {
+func selectOrInsertRefType(typeName string, template string) (*model.RefType, error) {
 	refType := &model.RefType{
 		TypeName: typeName,
+		VappTemplateName: template,
 	}
 	if _, err := db.Model(refType).Where("type_name = ?type_name").SelectOrInsert(); err != nil {
 		return nil, err
@@ -73,25 +74,6 @@ func populateConfiguration() error {
 		return err
 	}
 
-	refType, _ := selectOrInsertRefType("sdwan")
-	vappTemplate := &model.VappTemplate{
-		Name:      "Template",
-		ClusterID: cluster.ID,
-		RefTypeID: refType.ID,
-	}
-	if _, err := db.Model(vappTemplate).Where("name = ?name").SelectOrInsert(); err != nil {
-		return err
-	}
-
-	configuration := &model.Configuration{
-		DatastoreID:    datastore.ID,
-		VappTemplateID: vappTemplate.ID,
-	}
-	if _, err := db.Model(configuration).Where("datastore_id = ?datastore_id").
-		Where("vapp_template_id = ?vapp_template_id").SelectOrInsert(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -99,10 +81,10 @@ func InsertPrerequisite() error {
 	if err := populateRoot(); err != nil {
 		return err
 	}
-	if _, err := selectOrInsertRefType("Type-A"); err != nil {
+	if _, err := selectOrInsertRefType("Type-A","Type-A"); err != nil {
 		return err
 	}
-	if _, err := selectOrInsertRefType("Type-B"); err != nil {
+	if _, err := selectOrInsertRefType("Type-B", "Type-B"); err != nil {
 		return err
 	}
 	if err := populateConfiguration(); err != nil {
