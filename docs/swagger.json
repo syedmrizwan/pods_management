@@ -1,0 +1,98 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Pods Management Blueprint.",
+        "title": "Pods Management",
+        "contact": {
+            "name": "API Support",
+            "email": "syedmrizwan@outlook.com"
+        },
+        "license": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/update_pod": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Update Pod Configurtion",
+                "parameters": [
+                    {
+                        "description": "description",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.PodConfiguration"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "model.ConfigurationInfo": {
+            "type": "object",
+            "properties": {
+                "cluster_id": {
+                    "type": "integer"
+                },
+                "cluster_name": {
+                    "type": "string"
+                },
+                "datastore_id": {
+                    "type": "integer"
+                },
+                "datastore_name": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "template_name": {
+                    "type": "string"
+                },
+                "type_name": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                },
+                "vcenter_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PodConfiguration": {
+            "type": "object",
+            "properties": {
+                "configuration": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.ConfigurationInfo"
+                },
+                "pod_id": {
+                    "type": "integer"
+                },
+                "pod_name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

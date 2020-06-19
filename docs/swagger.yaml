@@ -1,0 +1,64 @@
+definitions:
+  model.ConfigurationInfo:
+    properties:
+      cluster_id:
+        type: integer
+      cluster_name:
+        type: string
+      datastore_id:
+        type: integer
+      datastore_name:
+        type: string
+      ip_address:
+        type: string
+      password:
+        type: string
+      template_name:
+        type: string
+      type_name:
+        type: string
+      user_name:
+        type: string
+      vcenter_id:
+        type: integer
+    type: object
+  model.PodConfiguration:
+    properties:
+      configuration:
+        $ref: '#/definitions/model.ConfigurationInfo'
+        type: object
+      pod_id:
+        type: integer
+      pod_name:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  contact:
+    email: syedmrizwan@outlook.com
+    name: API Support
+  description: Pods Management Blueprint.
+  license: {}
+  title: Pods Management
+  version: "1.0"
+paths:
+  /api/update_pod:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: description
+        in: body
+        name: payload
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/model.PodConfiguration'
+          type: array
+      produces:
+      - application/json
+      summary: Update Pod Configurtion
+      tags:
+      - API
+swagger: "2.0"
