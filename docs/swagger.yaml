@@ -1,4 +1,13 @@
 definitions:
+  model.Cluster:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      vcenter_id:
+        type: integer
+    type: object
   model.ConfigurationInfo:
     properties:
       cluster_id:
@@ -22,6 +31,56 @@ definitions:
       vcenter_id:
         type: integer
     type: object
+  model.Datastore:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      vcenter_id:
+        type: integer
+    type: object
+  model.Pod:
+    properties:
+      cluster:
+        $ref: '#/definitions/model.Cluster'
+        type: object
+      cluster_id:
+        type: integer
+      created_at:
+        type: string
+      datastore:
+        $ref: '#/definitions/model.Datastore'
+        type: object
+      datastore_id:
+        type: integer
+      id:
+        type: integer
+      ip_address:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      student:
+        $ref: '#/definitions/model.Student'
+        type: object
+      student_id:
+        type: integer
+      subscription_type_id:
+        type: integer
+      task_id:
+        type: integer
+    type: object
+  model.PodBody:
+    properties:
+      ip_address:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
   model.PodConfiguration:
     properties:
       configuration:
@@ -34,6 +93,98 @@ definitions:
       status:
         type: string
     type: object
+  model.RefType:
+    properties:
+      id:
+        type: integer
+      trainingContents:
+        items:
+          $ref: '#/definitions/model.TrainingContent'
+        type: array
+      type_name:
+        type: string
+      vapp_template_name:
+        type: string
+    type: object
+  model.Root:
+    properties:
+      account_id:
+        type: integer
+    type: object
+  model.Student:
+    properties:
+      created_at:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      tenant:
+        $ref: '#/definitions/model.Tenant'
+        type: object
+      tenant_id:
+        type: integer
+    type: object
+  model.SubscriptionType:
+    properties:
+      expiry_time:
+        type: string
+      id:
+        type: integer
+      pods:
+        items:
+          $ref: '#/definitions/model.Pod'
+        type: array
+      ref_type:
+        $ref: '#/definitions/model.RefType'
+        type: object
+      ref_type_id:
+        type: integer
+      tenant:
+        $ref: '#/definitions/model.Tenant'
+        type: object
+      tenant_id:
+        type: integer
+    type: object
+  model.Tenant:
+    properties:
+      activate_later:
+        type: boolean
+      activation_time:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      root:
+        $ref: '#/definitions/model.Root'
+        type: object
+      root_account_id:
+        type: integer
+      subscriptionTypes:
+        items:
+          $ref: '#/definitions/model.SubscriptionType'
+        type: array
+    type: object
+  model.TrainingContent:
+    properties:
+      content:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      ref_type_id:
+        type: integer
+    type: object
 info:
   contact:
     email: syedmrizwan@outlook.com
@@ -43,7 +194,28 @@ info:
   title: Pods Management
   version: "1.0"
 paths:
-  /api/update_pod:
+  /api/v1/create_pod:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: description
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.PodBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Pod'
+      summary: Create Pod
+      tags:
+      - API
+  /api/v1/update_pod:
     post:
       consumes:
       - application/json

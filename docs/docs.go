@@ -28,7 +28,40 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/update_pod": {
+        "/api/v1/create_pod": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Create Pod",
+                "parameters": [
+                    {
+                        "description": "description",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.PodBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Pod"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/update_pod": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -58,6 +91,20 @@ var doc = `{
         }
     },
     "definitions": {
+        "model.Cluster": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "vcenter_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.ConfigurationInfo": {
             "type": "object",
             "properties": {
@@ -93,6 +140,81 @@ var doc = `{
                 }
             }
         },
+        "model.Datastore": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "vcenter_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Pod": {
+            "type": "object",
+            "properties": {
+                "cluster": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Cluster"
+                },
+                "cluster_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "datastore": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Datastore"
+                },
+                "datastore_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "student": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Student"
+                },
+                "student_id": {
+                    "type": "integer"
+                },
+                "subscription_type_id": {
+                    "type": "integer"
+                },
+                "task_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PodBody": {
+            "type": "object",
+            "properties": {
+                "ip_address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "model.PodConfiguration": {
             "type": "object",
             "properties": {
@@ -108,6 +230,145 @@ var doc = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "model.RefType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "trainingContents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.TrainingContent"
+                    }
+                },
+                "type_name": {
+                    "type": "string"
+                },
+                "vapp_template_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Root": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Student": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "tenant": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Tenant"
+                },
+                "tenant_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.SubscriptionType": {
+            "type": "object",
+            "properties": {
+                "expiry_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "pods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Pod"
+                    }
+                },
+                "ref_type": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.RefType"
+                },
+                "ref_type_id": {
+                    "type": "integer"
+                },
+                "tenant": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Tenant"
+                },
+                "tenant_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Tenant": {
+            "type": "object",
+            "properties": {
+                "activate_later": {
+                    "type": "boolean"
+                },
+                "activation_time": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "root": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Root"
+                },
+                "root_account_id": {
+                    "type": "integer"
+                },
+                "subscriptionTypes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SubscriptionType"
+                    }
+                }
+            }
+        },
+        "model.TrainingContent": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ref_type_id": {
+                    "type": "integer"
                 }
             }
         }

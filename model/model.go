@@ -19,3 +19,9 @@ type PodConfiguration struct {
 	Configuration *ConfigurationInfo `json:"configuration"`
 	Status        string             `json:"status"`
 }
+
+type PodBody struct {
+	Name      string `json:"name"`
+	Status    string `json:"status"`
+	IpAddress string `json:"ip_address"`
+}

@@ -1,12 +1,42 @@
 package api
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/syedmrizwan/pods_management/database"
 	"github.com/syedmrizwan/pods_management/model"
 	"net/http"
-	"context"
+	"time"
 )
+
+// CreatePod godoc
+// @Tags API
+// @Summary Create Pod
+// @Accept json
+// @Produce json
+// @Param payload body model.PodBody true "description"
+// @Success 200 {object} model.Pod
+// @Router /api/v1/create_pod [post]
+func CreatePod(c *gin.Context) {
+	var podBody model.PodBody
+	ctx, cancel := context.WithTimeout(c, 500*time.Nanosecond)
+	defer cancel()
+	if err := c.ShouldBindJSON(&podBody); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+	db := database.GetConnection()
+	pod := model.Pod{
+		Name:      podBody.Name,
+		IpAddress: podBody.IpAddress,
+		Status:    podBody.Status,
+	}
+	if _, err := db.ModelContext(ctx, &pod).Insert(); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+	}
+
+	c.JSON(http.StatusCreated, pod)
+
+}
 
 // UpdatePodConfigurtion godoc
 // @Tags API
@@ -14,7 +44,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param payload body []model.PodConfiguration true "description"
-// @Router /api/update_pod [post]
+// @Router /api/v1/update_pod [post]
 func UpdatePodConfigurtion(c *gin.Context) {
 	db := database.GetConnection()
 	var podConfigurations []model.PodConfiguration
