@@ -180,6 +180,9 @@ var doc = `{
                 "ip_address": {
                     "type": "string"
                 },
+                "is_expired": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },

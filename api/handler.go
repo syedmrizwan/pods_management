@@ -19,7 +19,7 @@ import (
 // @Router /api/v1/create_pod [post]
 func CreatePod(c *gin.Context) {
 	var podBody model.PodBody
-	ctx, cancel := context.WithTimeout(c, 500*time.Nanosecond)
+	ctx, cancel := context.WithTimeout(c, 50*time.Second)
 	defer cancel()
 	if err := c.ShouldBindJSON(&podBody); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -32,8 +32,8 @@ func CreatePod(c *gin.Context) {
 	}
 	if _, err := db.ModelContext(ctx, &pod).Insert(); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
-
 	c.JSON(http.StatusCreated, pod)
 
 }

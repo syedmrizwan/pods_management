@@ -37,6 +37,7 @@ type Pod struct {
 	StudentID          int64      `pg:",fk" json:"student_id"`
 	Student            *Student   `json:"student"`
 	TaskID             int64      `json:"task_id"`
+	IsExpired          bool       `pg:"default:false" json:"is_expired"`
 	CreatedAt          time.Time  `pg:"default:now()" json:"created_at"`
 }
 
