@@ -108,6 +108,11 @@ definitions:
       vapp_template_name:
         type: string
     type: object
+  model.Response:
+    properties:
+      message:
+        type: string
+    type: object
   model.Root:
     properties:
       account_id:
@@ -215,6 +220,29 @@ paths:
           schema:
             $ref: '#/definitions/model.Pod'
       summary: Create Pod
+      tags:
+      - API
+  /api/v1/delete_pod:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: description
+        in: body
+        name: payload
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Delete Pods based on user request
       tags:
       - API
   /api/v1/update_pod:

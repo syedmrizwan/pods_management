@@ -73,3 +73,32 @@ func UpdatePodConfigurtion(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"Message": "Pods updated"})
 }
+
+// DeletePods godoc
+// @Tags API
+// @Summary Delete Pods based on user request
+// @Accept json
+// @Produce json
+// @Param payload body []int true "description"
+// @Success 200 {object} model.Response
+// @Router /api/v1/delete_pod [delete]
+func DeletePods(c *gin.Context){
+	ctx, cancel := context.WithTimeout(c, time.Minute)
+	defer cancel()
+	db := database.GetConnection()
+	var podIds []int
+
+	if err := c.ShouldBindJSON(&podIds); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Message": "Couldn't parse the request"})
+		return
+	}
+	var deletedpods []model.Pod
+	for _, id := range podIds{
+		deletedpods = append(deletedpods, model.Pod{ID: int64(id)})
+	}
+	//Bulk Delete
+	db.ModelContext(ctx, &deletedpods).Delete()
+
+	c.JSON(http.StatusOK, model.Response{Message: "Pods Deleted"})
+
+}

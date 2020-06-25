@@ -61,6 +61,42 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/delete_pod": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Delete Pods based on user request",
+                "parameters": [
+                    {
+                        "description": "description",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/update_pod": {
             "post": {
                 "consumes": [
@@ -252,6 +288,14 @@ var doc = `{
                     "type": "string"
                 },
                 "vapp_template_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Response": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

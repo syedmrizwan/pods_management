@@ -25,3 +25,7 @@ type PodBody struct {
 	Status    string `json:"status"`
 	IpAddress string `json:"ip_address"`
 }
+
+type Response struct {
+	Message string `json:"message"`
+}
