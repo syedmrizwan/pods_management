@@ -9,7 +9,7 @@ require (
 	github.com/gin-contrib/zap v0.0.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-pg/pg/v10 v10.0.0-beta.1
-	github.com/go-redis/redis v6.15.8+incompatible // indirect
+	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/gomodule/redigo v1.8.2 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
