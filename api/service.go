@@ -2,18 +2,27 @@ package api
 
 import (
 	"fmt"
+	"github.com/syedmrizwan/pods_management/model"
+	"log"
 	"time"
 )
 
+var configs = []model.ConfigurationInfo{
+	{IpAddress: "10.2.0.1", TypeName: "sdwan", DatastoreID: 123, ClusterID: 44, Password: "pass", UserName: "uuss", VcenterId: 123},
+	{IpAddress: "10.2.0.2", TypeName: "sdwan", DatastoreID: 123, ClusterID: 44, Password: "pass", UserName: "uuss", VcenterId: 123},
+	{IpAddress: "10.2.0.3", TypeName: "sdwan", DatastoreID: 123, ClusterID: 44, Password: "pass", UserName: "uuss", VcenterId: 123},
+	{IpAddress: "10.2.0.4", TypeName: "sdwan", DatastoreID: 123, ClusterID: 44, Password: "pass", UserName: "uuss", VcenterId: 123},
+}
+
 var slaveDns = map[int]map[string]interface{}{
-	0: {"connectstring": "root@tcp(172.16.0.164:3306)/shiqu_tools?charset=utf8", "weight": 8},
-	1: {"connectstring": "root@tcp(172.16.0.165:3306)/shiqu_tools?charset=utf8", "weight": 4},
-	2: {"connectstring": "root@tcp(172.16.0.166:3306)/shiqu_tools?charset=utf8", "weight": 2},
+	0: {"connectstring": configs[0], "weight": 1},
+	1: {"connectstring": configs[1], "weight": 1},
+	2: {"connectstring": configs[2], "weight": 1},
 }
 
 var i int = -1  // indicates the last selected server
 var cw int = 0  // indicates the weight of the current schedule
-var gcd int = 2 //The greatest common divisor of the current weight of ownership. For example, the greatest common divisor of 2,4,8 is: 2
+var gcd int = 1 //The greatest common divisor of the current weight of ownership. For example, the greatest common divisor of 2,4,8 is: 2
 /*
  Algorithm ideas:
  Cw is the current weight, traversing each server. If the weight of the server is greater than cw, the server executes once, after a round of polling, cw-gcd;
@@ -33,7 +42,13 @@ func getDns() string {
 		}
 
 		if weight, _ := slaveDns[i]["weight"].(int); weight >= cw {
-			return slaveDns[i]["connectstring"].(string)
+			res := slaveDns[i]["connectstring"]
+			config, ok := res.(model.ConfigurationInfo)
+			if !ok {
+				log.Printf("got data of type %T but wanted int", res)
+				return "Error"
+			}
+			return config.IpAddress
 		}
 	}
 }
