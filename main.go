@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/syedmrizwan/pods_management/redis"
 	"os"
 	"fmt"
 	"github.com/gin-contrib/cors"
@@ -21,6 +22,8 @@ import (
 // @contact.email syedmrizwan@outlook.com
 
 func main() {
+
+	redis.TestRedis()
 	testBufferedChannel()
 
 	r := gin.New()
