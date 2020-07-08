@@ -16,16 +16,7 @@ type Album struct {
 }
 
 func TestRedis() {
-	// Establish a connection to the Redis server listening on port
-	// 6379 of the local machine. 6379 is the default port, so unless
-	// you've already changed the Redis configuration file this should
-	// work.
-	conn, err := redis.Dial("tcp", "localhost:6379")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Importantly, use defer to ensure the connection is always
-	// properly closed before exiting the main() function.
+	conn := GetPool().Get()
 	defer conn.Close()
 
 	album := Album{
@@ -40,7 +31,7 @@ func TestRedis() {
 		return
 	}
 
-	_, err = conn.Do("RPUSH", "mylist13", string(b))
+	_, err = conn.Do("RPUSH", "mylist 13", string(b))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,14 +42,14 @@ func TestRedis() {
 		return
 	}
 
-	_, err = conn.Do("RPUSH", "mylist13", string(b))
+	_, err = conn.Do("RPUSH", "mylist 13", string(b))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Added")
 
-	reply, _ := redis.ByteSlices(conn.Do("BLPOP", "mylist13", 5))
+	reply, _ := redis.ByteSlices(conn.Do("BLPOP", "mylist 13", 5))
 
 	alb := &Album{}
 	err = json.Unmarshal(reply[1], alb)
