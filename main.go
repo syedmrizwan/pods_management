@@ -23,7 +23,9 @@ import (
 
 func main() {
 
-	redis.TestRedis()
+	redis.InsertVcenterDetailToRedis()
+	redis.RoundRobin()
+
 	testBufferedChannel()
 
 	r := gin.New()
