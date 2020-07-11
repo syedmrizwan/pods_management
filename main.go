@@ -25,6 +25,7 @@ func main() {
 
 	redis.InsertVcenterDetailToRedis()
 	redis.RoundRobin()
+	redis.RemoveConfigFromRedis("Remove vCenter")
 
 	testBufferedChannel()
 

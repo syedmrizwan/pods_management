@@ -146,3 +146,14 @@ func getRedisElement(listName string, objectToPop interface{}) error {
 	}
 	return nil
 }
+
+func RemoveConfigFromRedis(venter string) {
+	conn := GetPool().Get()
+	defer conn.Close()
+
+	_, err := conn.Do("LREM", "vcenters12", "10.0.0.11", 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Removed")
+}
