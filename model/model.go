@@ -29,3 +29,9 @@ type PodBody struct {
 type Response struct {
 	Message string `json:"message"`
 }
+
+type VcenterSummary struct {
+	IP       string
+	Username string
+	Password string
+}
