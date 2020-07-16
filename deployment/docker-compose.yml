@@ -1,0 +1,10 @@
+version: '3.1'
+
+services:
+    go-migrations:
+        image: migrator
+        container_name: go-migrate
+        command: -path=/migrations/ -database postgres://postgres:postgres@localhost:5432/pods_management1 up
+        network_mode: 'host'
+        # depends_on:
+        #   - postgres_server
