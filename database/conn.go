@@ -37,10 +37,7 @@ func populateRoot() error {
 }
 
 func selectOrInsertRefType(typeName string, template string) (*model.RefType, error) {
-	refType := &model.RefType{
-		TypeName: typeName,
-		VappTemplateName: template,
-	}
+	refType := &model.RefType{TypeName: typeName}
 	if _, err := db.Model(refType).Where("type_name = ?type_name").SelectOrInsert(); err != nil {
 		return nil, err
 	}
@@ -81,7 +78,7 @@ func InsertPrerequisite() error {
 	if err := populateRoot(); err != nil {
 		return err
 	}
-	if _, err := selectOrInsertRefType("Type-A","Type-A"); err != nil {
+	if _, err := selectOrInsertRefType("Type-A", "Type-A"); err != nil {
 		return err
 	}
 	if _, err := selectOrInsertRefType("Type-B", "Type-B"); err != nil {
